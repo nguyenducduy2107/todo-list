@@ -5,6 +5,7 @@
     <title>Todo List</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, intial-scale=1.0">
+    <link rel = "icon" href ="icon.png" type = "image/x-icon">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -13,22 +14,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
 <body class="content">
     <div class="header">
         <h1>Todo List</h1>
         <input type="text" id="myInput" placeholder="Add Item Here...">
         <span onclick="newElement()" class="addBtn" id="myBtn">Add</span>
+        <span onclick="saveData()" class="saveBtn" id="save">Save</span>
+        <!-- <span onclick="loadData()" class="loadBtn" id="load">Load</span> -->
     </div>
     <div class="list">
         <ul id="myUL">
-            <li>Go to the gym</li>
-            <li>Do the dishes</li>
-            <li>Watch a movie</li>
+
         </ul>
     </div>
 <script>
-    document.cookie = 'liState = getElementsById("myUL").value';
+    let todo = [
+        
+    ];
+    
+    window.onload = function loadData() {
+        let retrieved = localStorage.getItem("todos");
+        let todosparse = JSON.parse(retrieved);
+        for (let i = 0; i < todosparse.length; i++) {
+            var loadLi = document.createElement("li");
+            var text = document.createTextNode(todosparse[i][0]);
+            var span = document.createElement("SPAN");
+            var icon = document.createElement("I");
+            if (todosparse[i][1] === "checked") {
+                loadLi.appendChild(text);
+                document.getElementById("myUL").appendChild(loadLi);
+                icon.className = "fa fa-times";
+                span.appendChild(icon);
+                span.className = "close";
+                loadLi.appendChild(span);
+                loadLi.classList.toggle('checked');
+            } else if (todosparse[i][1] === "unchecked") {
+                loadLi.appendChild(text);
+                document.getElementById("myUL").appendChild(loadLi);
+                icon.className = "fa fa-times";
+                span.appendChild(icon);
+                span.className = "close";
+                loadLi.appendChild(span);
+                //loadLi.classList.toggle('unchecked');
+            }
+        }
+        for (i = 0; i < close.length; i++) {
+            close[i].onclick = function() {
+                var div = this.parentElement;
+                //div.style.display = "none";
+                div.remove();
+            };
+        }
+    }
+    
+    
+    $( "#myUL" ).sortable();
+    $( "#myUL" ).disableSelection();
     
     var input = document.getElementById("myInput");
     input.addEventListener("keyup", function(event) {
@@ -36,7 +80,7 @@
         event.preventDefault();
         document.getElementById("myBtn").click();
         }
-    });
+    }); 
     
     var list = document.querySelector('ul');
     list.addEventListener('click', function(ev) {
@@ -49,9 +93,11 @@
     var i;
     for (i = 0; i < myNodelist.length; i++) {
         var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
+        //var txt = document.createTextNode("\u00D7");
+        var icon = document.createElement("I");
+        icon.className = "fa fa-times";
         span.className = "close";
-        span.appendChild(txt);
+        span.appendChild(icon);
         myNodelist[i].appendChild(span);
     }
     
@@ -60,33 +106,54 @@
     for (i = 0; i < close.length; i++) {
         close[i].onclick = function() {
             var div = this.parentElement;
-            div.style.display = "none";
+            //div.style.display = "none";
+            div.remove();
         }
-    }
+    } 
     
     function newElement() {
-        var li = document.createElement("li");
+    
         var inputValue = document.getElementById("myInput").value;
-        var t = document.createTextNode(inputValue);
-        li.appendChild(t);
+        
         if (inputValue === '') {
             alert("Put in an item!");
-        } else {
-        document.getElementById("myUL").appendChild(li);
+            return;
         }
+        
+        var li = document.createElement("li");
+        var t = document.createTextNode(inputValue);
+        li.appendChild(t);
+        document.getElementById("myUL").appendChild(li);
+        
         document.getElementById("myInput").value = "";
         var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
+        var icon = document.createElement("I");
+        icon.className = "fa fa-times";
+        span.appendChild(icon);
         span.className = "close";
-        span.appendChild(txt);
         li.appendChild(span);
         for (i = 0; i < close.length; i++) {
             close[i].onclick = function() {
                 var div = this.parentElement;
-                div.style.display = "none";
+                //div.style.display = "none";
+                div.remove();
             }
-        }
+        } 
+        saveData();
     }
+    function saveData() {
+        todo = [];
+        $("#myUL li").each(function() {
+            if ($(this).hasClass("checked")) {
+                todo.push([this.innerText,'checked']);
+            } else {
+                todo.push([this.innerText,'unchecked']);
+            }
+            //localStorage.setItem('todos', JSON.stringify(todo));
+        });
+        localStorage.setItem('todos', JSON.stringify(todo));
+    }
+   
 </script>
 </body>
 </html>
